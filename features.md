@@ -31,8 +31,8 @@ Meta Features enabled by pdnsmgrd
 * stop
 * upgrade
 * restart
-  * DECIDE: can/should we do this inproc?
+  * TODO: can/should we do this inproc?
 * *pcap*
-  * DECIDE: How will this work?
+  * TODO: How will this work?
   * Should this happen in-daemon?
 

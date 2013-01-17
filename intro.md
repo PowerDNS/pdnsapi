@@ -2,9 +2,7 @@ Everything open for discussion.
 
 TODO:
 
-  * All the italic stuff
-  * All the DECIDE, FIXME, XXX, TBD stuff
-  * SHOULD, and so on.
+  * Everything marked as **TODO**
   * Finish data management (tsigkeys, …)
 
 Big Picture

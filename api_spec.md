@@ -224,7 +224,7 @@ config\_setting\_resource
        "value": "config_setting_value"
     }
 
-**XXX**: do we know the type of the config value?
+**TODO**: do we know the type of the config value?
 
 URL: /servers/:server\_id/config
 --------------------------------
@@ -267,7 +267,7 @@ zone_collection
     }
 
 
-**DECIDE**: gsqlbackend allows for multiple masters. Should we support this?
+**TODO**: gsqlbackend allows for multiple masters. Should we support this?
 
 
 ##### Parameters:
@@ -393,6 +393,7 @@ Return format:
 Zone Record Names
 =================
 
+**TODO**: This section is all wrong.
 
 URL: /servers/:server\_id/zones/:zone\_name/names/:name
 --------------------------------------------------------

@@ -4,6 +4,7 @@ TODO:
 
   * Everything marked as **TODO**
   * Finish data management (tsigkeys, …)
+  * Incorporate applicable ideas from http://mailman.powerdns.com/pipermail/pdns-users/2013-February/009613.html
 
 Big Picture
 ===========

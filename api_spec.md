@@ -267,9 +267,6 @@ zone_collection
     }
 
 
-**TODO**: gsqlbackend allows for multiple masters. Should we support this? - no, feature is undesigned in pdns
-
-
 ##### Parameters:
 
 * `kind`
@@ -299,6 +296,10 @@ Changes made through the Zones API will always yield valid zone data,
 and the zone will be properly "rectified". If changes are made through
 other means (e.g. direct database access), this is not guranteed to be
 true and clients SHOULD trigger rectify.
+
+Backends might implement additional features (by coincidence or not).
+These things are not supported through the API. (gsqlbackend multiple
+masters is an example of this.)
 
 
 URL: /servers/:server\_id/zones

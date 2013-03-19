@@ -24,7 +24,7 @@ present, will turn the response into a JSONP response.
 The `Accept:` header determines the output format. An unknown value or
 `\*/*` will cause a `400 Bad Request`.
 
-All text is UTF-8.
+All text is UTF-8 and HTTP headers will reflect this.
 
 Data types:
 
@@ -172,18 +172,18 @@ Servers
 server_resource
 ---------------
 
-Example with server `"inproc"`, which is the only server returned by pdns.
+Example with server `"localhost"`, which is the only server returned by pdns.
 
-pdnsmgrd and pdnscontrol MUST NOT return “inproc”, but SHOULD return
+pdnsmgrd and pdnscontrol MUST NOT return “localhost”, but SHOULD return
 other servers.
 
     {
       "type": "Server",
-      "id": "inproc",
-      "url": "/servers/inproc",
+      "id": "localhost",
+      "url": "/servers/localhost",
       "daemon_type": "recursor",
-      "config_url": "/servers/inproc/config{/config_setting}",
-      "zones_url": "/servers/inproc/zones{/zone}",
+      "config_url": "/servers/localhost/config{/config_setting}",
+      "zones_url": "/servers/localhost/zones{/zone}",
     }
 
 Note: On a pdns server, the servers collection is read-only, and the only
@@ -224,7 +224,7 @@ config\_setting\_resource
        "value": "config_setting_value"
     }
 
-**TODO**: do we know the type of the config value?
+**TODO**: do we know the type of the config value? - no, internally everything is string. Could be changed.
 
 URL: /servers/:server\_id/config
 --------------------------------
@@ -235,7 +235,7 @@ Allowed REST methods: `GET`, `POST`
 
 #### POST
 
-Ceates a new config setting. This is useful for creating configuration for new backends.
+Creates a new config setting. This is useful for creating configuration for new backends.
 
 
 URL: /servers/:server\_id/config/:config\_setting\_name
@@ -262,12 +262,12 @@ zone_collection
       "master": "<ip>",
       "dnssec": <bool>,
       "nsec3param": "<nsec3param record>",
-      "nsecnarrow": <bool>,
+      "nsec3narrow": <bool>,
       "presigned": <bool>
     }
 
 
-**TODO**: gsqlbackend allows for multiple masters. Should we support this?
+**TODO**: gsqlbackend allows for multiple masters. Should we support this? - no, feature is undesigned in pdns
 
 
 ##### Parameters:
@@ -293,7 +293,7 @@ zone_collection
 
 Turning on DNSSEC with custom keys: just create the zone with `dnssec`
 set to `false`, and add keys using the cryptokeys REST interface. Have
-some of them `active` set to `true`.
+at least one of them `active` set to `true`.
 
 Changes made through the Zones API will always yield valid zone data,
 and the zone will be properly "rectified". If changes are made through
@@ -309,10 +309,10 @@ Allowed REST methods: `GET`, `POST`
 #### POST
 Creates a new domain.
 
-* `dnssec`, `nsecnarrow`, `presigned`, `nsec3param`, `active-keys` are OPTIONAL.
-* `dnssec`, `nsecnarrow`, `presigned` default to `false`.
+* `dnssec`, `nsec3narrow`, `presigned`, `nsec3param`, `active-keys` are OPTIONAL.
+* `dnssec`, `nsec3narrow`, `presigned` default to `false`.
 * The server MUST create a SOA record. The created SOA record SHOULD have
-serial set to 1, use the nameserver name specified in `default-soa-name`
+serial set to 1 and use the nameserver name specified in `default-soa-name`
 in the pdns configuration.
 
 
@@ -336,15 +336,15 @@ Allowed methods: `PUT`
 Send a DNS NOTIFY to all slaves.
 
 Fails when zone kind is not `Master` or `Slave`, or `master` and `slave` are 
-disabled in pdns configuration.
+disabled in pdns configuration. Only works for `Slave` if renotify is on.
 
 Not supported for recursors.
 
 Clients MUST NOT send a body.
 
 
-URL: /servers/:server\_id/zones/:zone\_name/axfr-in
-----------------------------------------------------
+URL: /servers/:server\_id/zones/:zone\_name/axfr-retrieve
+---------------------------------------------------------
 
 Allowed methods: `PUT`
 
@@ -367,7 +367,7 @@ Rectifies a zone, regarding to auth. Server MUST NOT depend on consumers
 ever sending this, AS LONG AS the server is the only thing ever writing
 to the datastore.
 
-If the datastore has been written to using other means that this API,
+If the datastore has been written to using other means than this API,
 consumers MUST trigger a rectify, using either this API call or any 
 other method.
 
@@ -377,7 +377,7 @@ Clients MUST NOT send a body.
 URL: /servers/:server\_id/zones/:zone\_name/check
 -------------------------------------------------
 
-Allowed methods: `PUT`
+Allowed methods: `GET`
 
 Verify zone contents/configuration.
 
@@ -393,31 +393,32 @@ Return format:
 Zone Record Names
 =================
 
-**TODO**: This section is all wrong.
+**TODO**: This section is underdeveloped.
 
 URL: /servers/:server\_id/zones/:zone\_name/names/:name
 --------------------------------------------------------
 
-Allowed methods: `GET`, `POST`, `DELETE`
+Allowed methods: `GET`, `POST`, `DELETE`. Returns collection of RRsets keyed by type.
 
-URL: /servers/:server\_id/zones/:zone\_name/names/:name/rrtypes/:rrtype
+URL: /servers/:server\_id/zones/:zone\_name/names/:name/rrsets/:rrtype
 -----------------------------------------------------------------------
 
-Allowed methods: `GET`, `PUT`, `DELETE`
+Allowed methods: `GET`, `PUT`, `DELETE`. PUT replaces full rrset!
 
     {
-      "records": [
-        {
+      "rrs": 
+        [
+          {
            "content":"1.1.1.1",
            "name":"foo.ds9b.nl",
            "priority":"0",
            "ttl":"0",
-           "rrtype":"A"
-         },
-         ...
-      ]
+           "type":"A"
+          }
+        ]
     }
 
+Having `type` inside an RR differ from :rrtype in the URL is an error.
 
 Zone Metadata
 =============
@@ -504,6 +505,9 @@ URL: /servers/:server\_id/zones/:zone\_name/cryptokeys/:cryptokey\_id
 ---------------------------------------------------------------------
 
 Allowed methods: `GET`, `PUT`, `DELETE`
+
+**TODO**: only give out private key data if client ask explicitly, otherwise 
+stick to public part.
 
 Cache Access
 ============

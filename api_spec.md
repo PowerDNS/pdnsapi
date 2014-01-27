@@ -263,7 +263,8 @@ zone_collection
       "dnssec": <bool>,
       "nsec3param": "<nsec3param record>",
       "nsec3narrow": <bool>,
-      "presigned": <bool>
+      "presigned": <bool>,
+      "nameservers": ["<string>", ...]
     }
 
 
@@ -285,6 +286,8 @@ zone_collection
 
 * `notified_serial`, `serial` MUST NOT be sent in client bodies.
 
+* `nameservers` MUST be sent in client bodies during creation, and MUST
+  NOT be sent by the server.
 
 ##### Notes:
 

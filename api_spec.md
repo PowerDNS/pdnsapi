@@ -259,7 +259,7 @@ zone_collection
       "kind": "<zone_kind>",
       "serial": <int>,
       "notified_serial": <int>,
-      "master": "<ip>",
+      "masters": ["<ip>", ...],
       "dnssec": <bool>,
       "nsec3param": "<nsec3param record>",
       "nsec3narrow": <bool>,
@@ -301,8 +301,7 @@ other means (e.g. direct database access), this is not guranteed to be
 true and clients SHOULD trigger rectify.
 
 Backends might implement additional features (by coincidence or not).
-These things are not supported through the API. (gsqlbackend multiple
-masters is an example of this.)
+These things are not supported through the API.
 
 
 URL: /servers/:server\_id/zones

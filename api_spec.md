@@ -411,8 +411,10 @@ Return format:
 
 **TODO**: Not yet implemented.
 
-Zone Record Names
-=================
+Zone Resource Record Sets
+=========================
+
+Below as "RRsets". An RRset are all records for a given name and type.
 
 
 URL: /servers/:server\_id/zones/:zone\_id/rrset
@@ -444,10 +446,10 @@ Client body:
 Having `type` inside an RR differ from `type` at the top level is an error.
 
 * `name`
-  Name of the RRset to modify.
+  Full name of the RRset to modify. (Example: `foo.example.org`)
 
 * `type`
-  Type of the RRset to modify.
+  Type of the RRset to modify. (Example: `AAAA`)
 
 * `changetype`
   Must be `REPLACE` or `DELETE`.

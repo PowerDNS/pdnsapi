@@ -22,7 +22,7 @@ All GET requests support appending a `_callback` URL parameter, which, if
 present, will turn the response into a JSONP response.
 
 The `Accept:` header determines the output format. An unknown value or
-`\*/*` will cause a `400 Bad Request`.
+`*/*` will cause a `400 Bad Request`.
 
 All text is UTF-8 and HTTP headers will reflect this.
 
@@ -37,10 +37,9 @@ REST
 ----
 
 * GET: List/Retrieve. Success reply: `200 OK`
-* POST: Create. Success reply: `201 Created`, `Location:` header points
-  to new object
-* PUT: Update. Success reply: `204 No Content`
-* DELETE: Delete. Success reply: `200 OK`
+* POST: Create. Success reply: `200 OK`, with new object as body.
+* PUT: Update. Success reply: `200 OK`, with modified object as body.
+* DELETE: Delete. Success reply: `200 OK`, no body.
 
 not-so-REST
 -----------
@@ -58,7 +57,7 @@ Clients SHOULD support:
 
 * HTTP Basic Auth (used by pdns, pdnsmgrd)
 * OAuth (used by pdnscontrol)
-  * **TODO**: still very much open.
+  * **TODO**: Not implemented yet.
 
 Errors
 ------
@@ -73,7 +72,7 @@ for an error!
 Error responses have a JSON body of this format:
 
     {
-      "message": "short error message",
+      "error": "short error message",
       "errors": [
         { ... },
       ]
@@ -94,6 +93,7 @@ Allowed methods: `GET`
 
 **TODO**:
 
+* Not yet implemented.
 * `api_features`
   * `servers_modifiable`
   * `oauth`
@@ -182,6 +182,7 @@ other servers.
       "id": "localhost",
       "url": "/servers/localhost",
       "daemon_type": "recursor",
+      "version": "VERSION",
       "config_url": "/servers/localhost/config{/config_setting}",
       "zones_url": "/servers/localhost/zones{/zone}",
     }
@@ -191,6 +192,10 @@ allowed returned server is read-only as well.
 On a pdnscontrol server, the servers collection is read-write, and the
 returned server resources are read-write as well. Write permissions may
 depend on the credentials you have supplied.
+
+* daemon_type
+  May be one of `authoritative`, `recursor`.
+
 
 URL: /servers
 -------------
@@ -224,7 +229,6 @@ config\_setting\_resource
        "value": "config_setting_value"
     }
 
-**TODO**: do we know the type of the config value? - no, internally everything is string. Could be changed.
 
 URL: /servers/:server\_id/config
 --------------------------------
@@ -237,11 +241,15 @@ Allowed REST methods: `GET`, `POST`
 
 Creates a new config setting. This is useful for creating configuration for new backends.
 
+**TODO**: Not yet implemented.
+
 
 URL: /servers/:server\_id/config/:config\_setting\_name
 -------------------------------------------------------
 
 Allowed REST methods: `GET`, `PUT`
+
+**NOTE**: only the Recursors `allow_from` configuration setting can be retrieved or modified.
 
 
 Zones
@@ -253,10 +261,11 @@ zone_collection
 ---------------
 
     {
-      "name": "zone_name",
+      "id": "<id>",
+      "name": "<string>",
       "type": "Zone",
-      "url": "/servers/:server_id/zones/:zone_name",
-      "kind": "<zone_kind>",
+      "url": "/servers/:server_id/zones/:id",
+      "kind": "<kind>",
       "serial": <int>,
       "notified_serial": <int>,
       "masters": ["<ip>", ...],
@@ -264,14 +273,21 @@ zone_collection
       "nsec3param": "<nsec3param record>",
       "nsec3narrow": <bool>,
       "presigned": <bool>,
-      "nameservers": ["<string>", ...]
+      "nameservers": ["<string>", ...],
+      "servers": ["<string>", ...],
+      "recursion_desired": <bool>
     }
 
 
 ##### Parameters:
 
+* `id`
+  Opaque zone id, assigned by the Server. Do not interpret.
+  Guaranteed to be safe for embedding in URLs.
+
 * `kind`
-  `<zone_kind>`: `Native`, `Master` or `Slave`
+  Authoritative: `<kind>`: `Native`, `Master` or `Slave`
+  Recursor: `<kind>`: `Native`, or `Forwarded`
 
 * `dnssec`
   inferred from `presigned` being `true` XOR presence of at
@@ -284,10 +300,22 @@ zone_collection
   If `presigned` is `true`, no DNSSEC changes will be made to the zone
   or cryptokeys.
 
+  **TODO**: `dnssec`, `nsec3narrow`, `nsec3param`, `presigned` are not yet implemented.
+
 * `notified_serial`, `serial` MUST NOT be sent in client bodies.
+  **Note**: Authoritative only.
 
 * `nameservers` MUST be sent in client bodies during creation, and MUST
   NOT be sent by the server.
+  **Note**: Authoritative only.
+
+* `servers`: list of forwarded-to servers, including port.
+  **Note**: Recursor only.
+
+* `recursion_desired`: for `Forwarded` zones, if the RD bit should
+  be set.
+  **Note**: Authoritative only.
+
 
 ##### Notes:
 
@@ -318,9 +346,11 @@ Creates a new domain.
 serial set to 1 and use the nameserver name specified in `default-soa-name`
 in the pdns configuration.
 
+**TODO**: `dnssec`, `nsec3narrow`, `nsec3param`, `presigned` are not yet implemented.
 
-URL: /servers/:server\_id/zones/:zone\_name
--------------------------------------------
+
+URL: /servers/:server\_id/zones/:zone\_id
+-----------------------------------------
 
 Allowed methods: `GET`, `PUT`, `DELETE`
 
@@ -328,11 +358,11 @@ Allowed methods: `GET`, `PUT`, `DELETE`
 Returns zone information.
 
 #### DELETE
-Deletes this zone and all attached metadata, rrsets.
+Deletes this zone, all attached metadata and rrsets.
 
 
-URL: /servers/:server\_id/zones/:zone\_name/notify
---------------------------------------------------
+URL: /servers/:server\_id/zones/:zone\_id/notify
+------------------------------------------------
 
 Allowed methods: `PUT`
 
@@ -345,9 +375,11 @@ Not supported for recursors.
 
 Clients MUST NOT send a body.
 
+**TODO**: Not yet implemented.
 
-URL: /servers/:server\_id/zones/:zone\_name/axfr-retrieve
----------------------------------------------------------
+
+URL: /servers/:server\_id/zones/:zone\_id/axfr-retrieve
+-------------------------------------------------------
 
 Allowed methods: `PUT`
 
@@ -360,25 +392,10 @@ Not supported for recursors.
 
 Clients MUST NOT send a body.
 
+**TODO**: Not yet implemented.
 
-URL: /servers/:server\_id/zones/:zone\_name/rectify
----------------------------------------------------
-
-Allowed methods: `PUT`
-
-Rectifies a zone, regarding to auth. Server MUST NOT depend on consumers
-ever sending this, AS LONG AS the server is the only thing ever writing
-to the datastore.
-
-If the datastore has been written to using other means than this API,
-consumers MUST trigger a rectify, using either this API call or any 
-other method.
-
-Clients MUST NOT send a body.
-
-
-URL: /servers/:server\_id/zones/:zone\_name/check
--------------------------------------------------
+URL: /servers/:server\_id/zones/:zone\_id/check
+-----------------------------------------------
 
 Allowed methods: `GET`
 
@@ -392,36 +409,55 @@ Return format:
       "warnings": ["warning message1", ...]
     }
 
+**TODO**: Not yet implemented.
 
 Zone Record Names
 =================
 
-**TODO**: This section is underdeveloped.
 
-URL: /servers/:server\_id/zones/:zone\_name/names/:name
---------------------------------------------------------
+URL: /servers/:server\_id/zones/:zone\_id/rrset
+-----------------------------------------------
 
-Allowed methods: `GET`, `POST`, `DELETE`. Returns collection of RRsets keyed by type.
+Allowed methods: `PATCH`. Modifies present RRsets.
 
-URL: /servers/:server\_id/zones/:zone\_name/names/:name/rrsets/:rrtype
------------------------------------------------------------------------
+**Note**: Authoritative only.
 
-Allowed methods: `GET`, `PUT`, `DELETE`. PUT replaces full rrset!
+Client body:
 
     {
-      "rrs": 
+      "name": <string>,
+      "type": <string>,
+      "changetype": <changetype>,
+      "records":
         [
           {
-           "content":"1.1.1.1",
-           "name":"foo.ds9b.nl",
-           "priority":"0",
-           "ttl":"0",
-           "type":"A"
+            "content": <string>,
+            "name": <string>,
+            "priority": <int>,
+            "ttl": <int>,
+            "type": <string>,
+            "disabled": <bool>
           }
         ]
     }
 
-Having `type` inside an RR differ from :rrtype in the URL is an error.
+Having `type` inside an RR differ from `type` at the top level is an error.
+
+* `name`
+  Name of the RRset to modify.
+
+* `type`
+  Type of the RRset to modify.
+
+* `changetype`
+  Must be `REPLACE` or `DELETE`.
+  With `REPLACE`, all existing RRs matching `name` and `type` will be deleted, and then new records given in `records` will be created.
+  With `DELETE`, all existing RRs matching `name` and `type` will be deleted.
+
+* `records`
+  List of new records. Must be empty with `changetype` being set to `DELETE`.
+
+
 
 Zone Metadata
 =============
@@ -452,11 +488,14 @@ Collection access.
 
 Allowed methods: `GET`, `POST`
 
+**TODO**: Not yet implemented.
+
 URL: /servers/:server\_id/zones/:zone\_name/metadata/:metadata\_kind
 --------------------------------------------------------------------
 
 Allowed methods: `GET`, `PUT`, `DELETE`
 
+**TODO**: Not yet implemented.
 
 CryptoKeys
 ==========
@@ -488,6 +527,8 @@ Collection access.
 
 Allowed methods: `GET`, `POST`
 
+**TODO**: Not yet implemented.
+
 #### POST
 
 Creates a new, single cryptokey.
@@ -512,11 +553,14 @@ Allowed methods: `GET`, `PUT`, `DELETE`
 **TODO**: only give out private key data if client ask explicitly, otherwise 
 stick to public part.
 
+**TODO**: Not yet implemented.
+
 Cache Access
 ============
 
 **TODO**: Peek at the cache, clear the cache, possibly dump it into a file?
 
+**TODO**: Not yet implemented.
 
 Logging & Statistics
 ====================
@@ -538,6 +582,7 @@ Query the log, filtered by `:search_term`. Response body:
       ]
     }
 
+**TODO**: Not yet implemented.
 
 URL: /servers/:server\_id/statistics
 ------------------------------------
@@ -546,9 +591,12 @@ URL: /servers/:server\_id/statistics
 * Auth: ?
 * Recursor: ?
 
+**TODO**: Not yet implemented.
 
 URL: /servers/:server\_id/trace
 -------------------------------
+
+**TODO**: Not yet implemented.
 
 #### PUT (Configure)
 
@@ -577,6 +625,8 @@ Retrieve query tracing log and current config. Response body:
 
 URL: /servers/:server\_id/failures
 ----------------------------------
+
+**TODO**: Not yet implemented.
 
 #### PUT
 
@@ -667,6 +717,8 @@ Where `<failure_code>` is one of these:
 Data Overrides
 ==============
 
+**TODO**: Not yet implemented.
+
 override\_type
 --------------
 
@@ -711,11 +763,15 @@ Clears recursively all cached data ("plain" DNS + DNSSEC)
 URL: /servers/:server\_id/overrides
 ----------------------------------
 
+**TODO**: Not yet implemented.
+
 Collection access.
 
 Allowed Methods: `GET`, `POST`
 
 URL: /servers/:server\_id/overrides/:override\_id
 -------------------------------------------------
+
+**TODO**: Not yet implemented.
 
 Allowed methods: `GET`, `PUT`, `DELETE`

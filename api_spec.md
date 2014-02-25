@@ -257,6 +257,11 @@ Zones
 
 Authoritative DNS Zones.
 
+A Resource Record Set (below as "RRset") are all records for a given name and type.
+
+Comments are per-RRset.
+
+
 zone_collection
 ---------------
 
@@ -352,13 +357,71 @@ in the pdns configuration.
 URL: /servers/:server\_id/zones/:zone\_id
 -----------------------------------------
 
-Allowed methods: `GET`, `PUT`, `DELETE`
+Allowed methods: `GET`, `PUT`, `DELETE`, `PATCH`.
 
 #### GET
 Returns zone information.
 
 #### DELETE
 Deletes this zone, all attached metadata and rrsets.
+
+#### PATCH
+
+Modifies present RRsets and comments.
+
+**Note**: Authoritative only.
+
+Client body:
+
+    {
+      "name": <string>,
+      "type": <string>,
+      "changetype": <changetype>,
+      "records":
+        [
+          {
+            "content": <string>,
+            "name": <string>,
+            "priority": <int>,
+            "ttl": <int>,
+            "type": <string>,
+            "disabled": <bool>
+          }, ...
+        ],
+      "comments":
+        [
+          {
+            "account": <string>,
+            "content": <string>,
+            "modfied_at": <int>
+          }, ...
+        ]
+    }
+
+Having `type` inside an RR differ from `type` at the top level is an error.
+
+* `name`
+  Full name of the RRset to modify. (Example: `foo.example.org`)
+
+* `type`
+  Type of the RRset to modify. (Example: `AAAA`)
+
+* `changetype`
+  Must be `REPLACE` or `DELETE`.
+  With `DELETE`, all existing RRs matching `name` and `type` will be deleted, incl. all comments.
+  With `REPLACE`: when `records` is present, all existing RRs matching `name` and `type` will be deleted, and then new records given in `records` will be created.
+  If no records are left, any existing comments will be deleted as well.
+  When `comments` is present, all existing comments for the RRs matching `name` and `type` will be deleted, and then new comments given in `comments` will be created.
+
+* `records`
+  List of new records (replacing the old ones). Must be empty when `changetype` is set to `DELETE`.
+  An empty list results in deletion of all records (and comments).
+
+* `comments`
+  List of new comments (replacing the old ones). Must be empty when `changetype` is set to `DELETE`.
+  An empty list results in deletion of all comments.
+  `modified_at` is optional and defaults to the current server time.
+
 
 
 URL: /servers/:server\_id/zones/:zone\_id/notify
@@ -410,56 +473,6 @@ Return format:
     }
 
 **TODO**: Not yet implemented.
-
-Zone Resource Record Sets
-=========================
-
-Below as "RRsets". An RRset are all records for a given name and type.
-
-
-URL: /servers/:server\_id/zones/:zone\_id/rrset
------------------------------------------------
-
-Allowed methods: `PATCH`. Modifies present RRsets.
-
-**Note**: Authoritative only.
-
-Client body:
-
-    {
-      "name": <string>,
-      "type": <string>,
-      "changetype": <changetype>,
-      "records":
-        [
-          {
-            "content": <string>,
-            "name": <string>,
-            "priority": <int>,
-            "ttl": <int>,
-            "type": <string>,
-            "disabled": <bool>
-          }
-        ]
-    }
-
-Having `type` inside an RR differ from `type` at the top level is an error.
-
-* `name`
-  Full name of the RRset to modify. (Example: `foo.example.org`)
-
-* `type`
-  Type of the RRset to modify. (Example: `AAAA`)
-
-* `changetype`
-  Must be `REPLACE` or `DELETE`.
-  With `REPLACE`, all existing RRs matching `name` and `type` will be deleted, and then new records given in `records` will be created.
-  With `DELETE`, all existing RRs matching `name` and `type` will be deleted.
-
-* `records`
-  List of new records. Must be empty with `changetype` being set to `DELETE`.
-
-
 
 Zone Metadata
 =============

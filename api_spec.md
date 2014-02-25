@@ -280,7 +280,9 @@ zone_collection
       "presigned": <bool>,
       "nameservers": ["<string>", ...],
       "servers": ["<string>", ...],
-      "recursion_desired": <bool>
+      "recursion_desired": <bool>,
+      "records": [<record>, ...],
+      "comments": [<comment>, ...],
     }
 
 
@@ -321,6 +323,9 @@ zone_collection
   be set.
   **Note**: Authoritative only.
 
+* `records`: list of DNS records in the zone.
+
+* `comments`: list of comments in the zone.
 
 ##### Notes:
 

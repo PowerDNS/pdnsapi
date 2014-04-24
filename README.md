@@ -32,7 +32,7 @@ After restarting `pdns_server`, the following examples should start working:
     # List zones
     curl -v http://a:changeme@127.0.0.1:8081/servers/localhost/zones | jq .
     # Create new zone "example.org" with nameservers ns1.example.org, ns2.example.org
-    curl -X POST --data '{"name":"example.org", "kind": "Native", "masters": [], "nameservers": ["ns1.example.org", "ns2.example.org"]}' -v http://a:changeme@127.0.0.1:8081:8081/servers/localhost/zones | jq .
+    curl -X POST --data '{"name":"example.org", "kind": "Native", "masters": [], "nameservers": ["ns1.example.org", "ns2.example.org"]}' -v http://a:changeme@127.0.0.1:8081/servers/localhost/zones | jq .
     # Show the new zone
     curl -v http://a:changeme@127.0.0.1:8081/servers/localhost/zones/example.org | jq .
 

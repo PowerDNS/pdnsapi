@@ -357,7 +357,7 @@ serial set to 1 and use the nameserver name specified in `default-soa-name`
 in the pdns configuration.
 
 **TODO**: `dnssec`, `nsec3narrow`, `nsec3param`, `presigned` are not yet implemented.
-
+**TODO**: default-soa-name is curently ignored by the API, instead the first nameserver from the nameservers array is chosen.
 
 URL: /servers/:server\_id/zones/:zone\_id
 -----------------------------------------

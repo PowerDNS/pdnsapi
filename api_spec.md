@@ -355,11 +355,15 @@ Creates a new domain.
 * `dnssec`, `nsec3narrow`, `presigned`, `nsec3param`, `active-keys` are OPTIONAL.
 * `dnssec`, `nsec3narrow`, `presigned` default to `false`.
 * The server MUST create a SOA record. The created SOA record SHOULD have
-serial set to 1 and use the nameserver name specified in `default-soa-name`
-in the pdns configuration.
+serial set to the value given as `serial` (or 0 if missing), use the
+nameserver name, email, TTL values as specified in the pdns configuration
+(`default-soa-name`, `default-soa-mail`, etc).
+These default values can be overridden by supplying a custom SOA record in
+the records list.
+If `soa_edit_api` is set, the SOA record is edited according to the SOA-EDIT-API
+rules before storing it. (Also applies to custom SOA records.)
 
 **TODO**: `dnssec`, `nsec3narrow`, `nsec3param`, `presigned` are not yet implemented.
-**TODO**: default-soa-name is curently ignored by the API, instead the first nameserver from the nameservers array is chosen.
 
 URL: /servers/:server\_id/zones/:zone\_id
 -----------------------------------------

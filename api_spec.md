@@ -289,7 +289,7 @@ zone_collection
 ##### Parameters:
 
 * `id`
-  Opaque zone id, assigned by the Server. Do not interpret.
+  Opaque zone id (string), assigned by the Server. Do not interpret.
   Guaranteed to be safe for embedding in URLs.
 
 * `kind`
@@ -313,7 +313,7 @@ zone_collection
   **Note**: Authoritative only.
 
 * `nameservers` MUST be sent in client bodies during creation, and MUST
-  NOT be sent by the server.
+  NOT be sent by the server. Simple list of strings of nameserver names.
   **Note**: Authoritative only.
 
 * `servers`: list of forwarded-to servers, including port.
@@ -324,8 +324,10 @@ zone_collection
   **Note**: Authoritative only.
 
 * `records`: list of DNS records in the zone.
+  **Note**: Modifications are supported on Authoritative only.
 
 * `comments`: list of comments in the zone.
+  **Note**: Authoritative only.
 
 ##### Notes:
 

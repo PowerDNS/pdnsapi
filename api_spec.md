@@ -438,6 +438,13 @@ Having `type` inside an RR differ from `type` at the top level is an error.
   An empty list results in deletion of all comments.
   `modified_at` is optional and defaults to the current server time.
 
+#### PUT
+
+Modifies basic zone data (metadata).
+
+Allowed fields in client body: all except `id` and `url`.
+
+Changing `name` renames the zone, as expected.
 
 
 URL: /servers/:server\_id/zones/:zone\_id/notify

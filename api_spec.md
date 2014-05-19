@@ -382,31 +382,36 @@ Modifies present RRsets and comments.
 
 **Note**: Authoritative only.
 
-Client body:
+Client body for PATCH:
 
-    {
-      "name": <string>,
-      "type": <string>,
-      "changetype": <changetype>,
-      "records":
-        [
-          {
-            "content": <string>,
-            "name": <string>,
-            "priority": <int>,
-            "ttl": <int>,
-            "type": <string>,
-            "disabled": <bool>
-          }, ...
-        ],
-      "comments":
-        [
-          {
-            "account": <string>,
-            "content": <string>,
-            "modfied_at": <int>
-          }, ...
-        ]
+    { "rrsets":
+      [
+        {
+          "name": <string>,
+          "type": <string>,
+          "changetype": <changetype>,
+          "records":
+            [
+              {
+                "content": <string>,
+                "name": <string>,
+                "priority": <int>,
+                "ttl": <int>,
+                "type": <string>,
+                "disabled": <bool>
+              }, ...
+            ],
+          "comments":
+            [
+              {
+                "account": <string>,
+                "content": <string>,
+                "modfied_at": <int>
+              }, ...
+            ]
+        },
+        { ... }
+      ]
     }
 
 Having `type` inside an RR differ from `type` at the top level is an error.

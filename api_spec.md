@@ -312,7 +312,7 @@ zone_collection
 * `notified_serial`, `serial` MUST NOT be sent in client bodies.
   **Note**: Authoritative only.
 
-* `nameservers` MUST be sent in client bodies during creation, and MUST
+* `nameservers` MAY be sent in client bodies during creation, and MUST
   NOT be sent by the server. Simple list of strings of nameserver names.
   **Note**: Authoritative only.
 
@@ -342,6 +342,9 @@ true and clients SHOULD trigger rectify.
 
 Backends might implement additional features (by coincidence or not).
 These things are not supported through the API.
+
+When creating a slave zone, it is recommended to not set any of
+`nameservers`, `records`.
 
 
 URL: /servers/:server\_id/zones

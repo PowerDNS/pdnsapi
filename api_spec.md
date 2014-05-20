@@ -615,15 +615,10 @@ Allowed methods: `GET` (Query)
 
 Query the log, filtered by `:search_term`. Response body:
 
-    {
-      "q": "<search_term>",
-      "log": [
-        "<log_line>",
-        ...
-      ]
-    }
-
-**TODO**: Not yet implemented.
+    [
+      "<log_line>",
+      ...
+    ]
 
 URL: /servers/:server\_id/statistics
 ------------------------------------

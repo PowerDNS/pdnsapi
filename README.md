@@ -45,7 +45,6 @@ Try it (Recursor edition)
 
 Install PowerDNS Recursor, configured as follows:
 
-    experimental-json-interface=yes
     experimental-webserver=yes
     experimental-webserver-password=changeme
     auth-zones=

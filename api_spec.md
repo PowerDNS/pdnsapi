@@ -623,11 +623,24 @@ Query the log, filtered by `:search_term`. Response body:
 URL: /servers/:server\_id/statistics
 ------------------------------------
 
-* Top-X domains?
-* Auth: ?
-* Recursor: ?
+Allowed methods: `GET` (Query)
 
-**TODO**: Not yet implemented.
+#### GET (Query)
+
+Query PowerDNS internal statistics. Response body:
+
+    [
+      {
+        "type": "StatisticItem",
+        "name": "<name>",
+        "value": "<value>"
+      },
+      ...
+    ]
+
+The statistic entries are dependent on the daemon type.
+Values are returned as strings.
+
 
 URL: /servers/:server\_id/trace
 -------------------------------

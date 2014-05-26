@@ -278,6 +278,8 @@ zone_collection
       "nsec3param": "<nsec3param record>",
       "nsec3narrow": <bool>,
       "presigned": <bool>,
+      "soa_edit": "<string>",
+      "soa_edit_api": "<string>",
       "nameservers": ["<string>", ...],
       "servers": ["<string>", ...],
       "recursion_desired": <bool>,
@@ -306,8 +308,20 @@ zone_collection
   zones.
   If `presigned` is `true`, no DNSSEC changes will be made to the zone
   or cryptokeys.
+  **Note**: Authoritative only.
 
   **TODO**: `dnssec`, `nsec3narrow`, `nsec3param`, `presigned` are not yet implemented.
+
+* `soa_edit` MAY be set to change the `SOA-EDIT` zone setting. See
+  http://doc.powerdns.com/html/domainmetadata.html for more information.
+  **Note**: Authoritative only.
+
+  **TODO**: `soa_edit` is not yet implemented.
+
+* `soa_edit_api` MAY be set. If it is set, on changes to the contents of
+  a zone made through the API, the SOA record will be edited according to
+  the SOA-EDIT-API rules. (Which are the same as the SOA-EDIT rules.)
+  **Note**: Authoritative only.
 
 * `notified_serial`, `serial` MUST NOT be sent in client bodies.
   **Note**: Authoritative only.

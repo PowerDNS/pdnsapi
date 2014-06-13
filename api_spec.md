@@ -316,8 +316,6 @@ zone_collection
   http://doc.powerdns.com/html/domainmetadata.html for more information.
   **Note**: Authoritative only.
 
-  **TODO**: `soa_edit` is not yet implemented.
-
 * `soa_edit_api` MAY be set. If it is set, on changes to the contents of
   a zone made through the API, the SOA record will be edited according to
   the SOA-EDIT-API rules. (Which are the same as the SOA-EDIT rules.)
@@ -328,7 +326,7 @@ zone_collection
 
 * `nameservers` MAY be sent in client bodies during creation, and MUST
   NOT be sent by the server. Simple list of strings of nameserver names.
-  **Note**: Authoritative only.
+  **Note**: Authoritative only. Not required for slave zones.
 
 * `servers`: list of forwarded-to servers, including port.
   **Note**: Recursor only.
@@ -558,35 +556,42 @@ CryptoKeys
 cryptokey\_resource
 -------------------
 
-    {
+    {[
       "type": "CryptoKey",
       "id": <int>,
       "active": <bool>,
-      "flags": [<key_flag>, ...]
-      "content": <string>
-    }
+      "keytype": <keytype>,
+      "content": <string>,
+      "ds": [ <ds>,
+              <ds>,
+              .... ]
+    ]}
 
 
 ##### Parameters:
 
 `id`: read-only.
 
-`flags`: `<key_flag>` is one of the following: `ksk` or `zsk`, and they are
-both mutually exclusive. All other flags are reserved.
+`keytype`: `<keytype>` is one of the following: `ksk` or `zsk`, and they are
+both mutually exclusive.
+
+`ds`: an array with all dses for this key
 
 
 URL: /servers/:server\_id/zones/:zone\_name/cryptokeys
 ------------------------------------------------------
 
-Collection access.
-
 Allowed methods: `GET`, `POST`
 
-**TODO**: Not yet implemented.
+#### GET
+
+Returns all public data about cryptokeys, but not `content`.
 
 #### POST
 
 Creates a new, single cryptokey.
+
+**TODO**: Not yet implemented.
 
 ##### Parameters:
 
@@ -605,8 +610,15 @@ URL: /servers/:server\_id/zones/:zone\_name/cryptokeys/:cryptokey\_id
 
 Allowed methods: `GET`, `PUT`, `DELETE`
 
-**TODO**: only give out private key data if client ask explicitly, otherwise 
-stick to public part.
+#### GET
+
+Returns all public data about cryptokeys, including `content`. An array is returned, eventhough a single key is requested.
+
+#### PUT
+
+**TODO**: Not yet implemented.
+
+#### DELETE
 
 **TODO**: Not yet implemented.
 

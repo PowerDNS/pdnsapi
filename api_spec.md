@@ -561,6 +561,7 @@ cryptokey\_resource
       "id": <int>,
       "active": <bool>,
       "keytype": <keytype>,
+      "dnskey": <string>,
       "content": <string>,
       "ds": [ <ds>,
               <ds>,
@@ -574,6 +575,8 @@ cryptokey\_resource
 
 `keytype`: `<keytype>` is one of the following: `ksk` or `zsk`, and they are
 both mutually exclusive.
+
+`dnskey`: the DNSKEY for this key
 
 `ds`: an array with all dses for this key
 
@@ -612,7 +615,7 @@ Allowed methods: `GET`, `PUT`, `DELETE`
 
 #### GET
 
-Returns all public data about cryptokeys, including `content`. An array is returned, eventhough a single key is requested.
+Returns all public data about cryptokeys, including `content`, with all the private data. An array is returned, eventhough a single key is requested.
 
 #### PUT
 

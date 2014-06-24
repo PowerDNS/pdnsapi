@@ -37,7 +37,7 @@ REST
 ----
 
 * GET: List/Retrieve. Success reply: `200 OK`
-* POST: Create. Success reply: `200 OK`, with new object as body.
+* POST: Create. Success reply: `201 Created`, with new object as body.
 * PUT: Update. Success reply: `200 OK`, with modified object as body.
 * DELETE: Delete. Success reply: `200 OK`, no body.
 
